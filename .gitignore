@@ -45,4 +45,4 @@ logs/
 /tmp/
 
 # meilisearch binary
-/api/meilisearch/meilisearch
+api/meilisearch/meilisearch
