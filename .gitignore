@@ -44,5 +44,5 @@ logs/
 # Temporary files
 /tmp/
 
-# meilisearch binary
-api/meilisearch/meilisearch
+# meilisearch binary and data
+api/meilisearch
