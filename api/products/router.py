@@ -2,12 +2,15 @@ from fastapi import APIRouter, Depends, HTTPException, Response
 from sqlalchemy.orm import Session
 from typing import List
 
-from database import get_db
-from models import Product, Category, Attribute
-from schemas import ProductCreate, ProductOut
+from core.dependencies import get_db
+from products.model import Product
+from categories.model import Category
+from attributes.model import Attribute
+from products.schemas import ProductCreate, ProductOut
 from services.meili import meili_service
 
 router = APIRouter(prefix="/products", tags=["products"])
+
 
 @router.post("/", response_model=ProductOut)
 def create_product(product: ProductCreate, db: Session = Depends(get_db)):
@@ -49,10 +52,12 @@ def create_product(product: ProductCreate, db: Session = Depends(get_db)):
 
     return db_product
 
+
 @router.get("/", response_model=List[ProductOut])
 def list_products(db: Session = Depends(get_db)):
     products = db.query(Product).all()
     return products
+
 
 @router.get("/{product_id}", response_model=ProductOut)
 def get_product(product_id: int, db: Session = Depends(get_db)):
@@ -60,6 +65,7 @@ def get_product(product_id: int, db: Session = Depends(get_db)):
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
     return product
+
 
 @router.put("/{product_id}", response_model=ProductOut)
 def update_product(product_id: int, product: ProductCreate, db: Session = Depends(get_db)):
@@ -109,6 +115,7 @@ def update_product(product_id: int, product: ProductCreate, db: Session = Depend
 
     return db_product
 
+
 @router.delete("/{product_id}", status_code=204)
 def delete_product(product_id: int, db: Session = Depends(get_db)):
     product = db.query(Product).filter(Product.id == product_id).first()
@@ -129,3 +136,4 @@ def delete_product(product_id: int, db: Session = Depends(get_db)):
         meili_service.delete_attributes(attribute_ids)
 
     return Response(status_code=204)
+

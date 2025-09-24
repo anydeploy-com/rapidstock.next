@@ -1,7 +1,14 @@
 import os
+from pathlib import Path
+
+# Base directories
+API_DIR = Path(__file__).resolve().parent.parent  # api/
+DATA_SQLITE_DIR = API_DIR.parent / "data" / "sqlite"
+DATA_SQLITE_DIR.mkdir(parents=True, exist_ok=True)
+DB_PATH = DATA_SQLITE_DIR / "rapidstock.db"
 
 # Database configuration
-DATABASE_URL = "sqlite:///../data/sqlite/rapidstock.db"
+DATABASE_URL = f"sqlite:///{DB_PATH.as_posix()}"
 
 # Meilisearch configuration
 MEILI_URL = os.getenv("MEILI_URL", "http://127.0.0.1:7700")

@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, Text
 from sqlalchemy.orm import relationship
-from database import Base
+from db.session import Base
+
 
 class Category(Base):
     __tablename__ = "categories"
@@ -8,3 +9,4 @@ class Category(Base):
     name = Column(String, index=True)
     description = Column(Text)
     products = relationship("Product", backref="category")
+
