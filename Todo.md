@@ -1,1 +1,1 @@
-- [ ] add dynamic subdomains using nginx - from folder 
+- [ ] add dynamic subdomains using nginx - from folder
