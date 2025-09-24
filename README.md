@@ -74,7 +74,7 @@ npm run dev
 
 ## Technology Stack
 
-- **Backend**: Python 3.12 + FastAPI 0.117.1
+- **Backend**: Python 3.13.5 + FastAPI 0.117.1
 - **Admin**: Vue.js 3 + Vite
 - **Frontend**: Nuxt 4.1.2 + Vue.js 3
-- **Development**: Node.js 20.19.5, npm 10.8.2
+- **Development**: Node.js 24.8.0, npm 11.6.0

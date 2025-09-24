@@ -1,7 +1,6 @@
 from fastapi import FastAPI, Depends, HTTPException, Response
 from sqlalchemy import create_engine, Column, Integer, String, Text, ForeignKey, event
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, relationship, Session
+from sqlalchemy.orm import declarative_base, sessionmaker, relationship, Session
 import meilisearch
 from pydantic import BaseModel
 from typing import Optional, List
@@ -21,9 +20,9 @@ if not logger.handlers:
     logger.addHandler(handler)
 logger.setLevel(logging.INFO)
 
-DATABASE_URL = "sqlite:///./rapidstock.db"
+DATABASE_URL = "sqlite:///../data/sqlite/rapidstock.db"
 MEILI_URL = os.getenv("MEILI_URL", "http://127.0.0.1:7700")
-MEILI_API_KEY = os.getenv("MEILI_API_KEY", "masterKey")
+MEILI_API_KEY = os.getenv("MEILI_API_KEY", "qRT4skbJgqeeTdsw8oABvC0AF9qcl10cz-1VTYEu_Hs")
 
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 
@@ -38,7 +37,7 @@ def set_sqlite_pragma(dbapi_connection, connection_record):
     finally:
         cursor.close()
 
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+SessionLocal = sessionmaker(bind=engine, autoflush=False, expire_on_commit=True)
 Base = declarative_base()
 
 
@@ -133,7 +132,9 @@ def on_startup():
                 logger.info(f"Created missing index '{idx}' in {(time.perf_counter()-t_idx)*1000:.1f} ms")
     except Exception as e:
         logger.error(f"[Startup Error] Could not connect to Meilisearch at {MEILI_URL}: {e}")
-        raise RuntimeError("Meilisearch is not running at {}. Please start Meilisearch before running the API.".format(MEILI_URL))
+        logger.warning("Continuing startup without Meilisearch sync. Search endpoints may be unavailable.")
+        logger.info(f"Startup complete in {(time.perf_counter()-start_total)*1000:.1f} ms (skipped Meilisearch sync)")
+        return
 
     # Sync all DB data to Meilisearch
     db = SessionLocal()
