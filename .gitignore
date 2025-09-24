@@ -45,6 +45,4 @@ logs/
 /tmp/
 
 # Data folder
-data/
-*/data/
-data/
+/data/
