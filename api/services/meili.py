@@ -128,6 +128,14 @@ class MeilisearchService:
                 f"Meilisearch indexing failed for category {category_data.get('id')}: {e}"
             )
 
+    def delete_category(self, category_id):
+        try:
+            self.client.index(CATEGORY_INDEX).delete_document(category_id)
+        except Exception as e:
+            logger.warning(
+                f"Failed to delete category {category_id} from Meilisearch: {e}"
+            )
+
     def add_attributes(self, attribute_docs):
         try:
             if attribute_docs:
