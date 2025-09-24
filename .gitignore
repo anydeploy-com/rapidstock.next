@@ -44,6 +44,6 @@ logs/
 # Temporary files
 /tmp/
 
-# meili binary and data
-api/meili/
-api/meili/**
+# Data folder
+data/
+*/data/
