@@ -6,5 +6,5 @@ curl -L https://install.meilisearch.com | sh
 
 # Move the binary to ../api/meili
 mkdir -p ../api/meili
-mv -f meilisearch ../api/meili/meilisearch
-chmod +x ../api/meili/meilisearch
+mv -f meilisearch ../data/meili/meilisearch
+chmod +x ../data/meili/meilisearch

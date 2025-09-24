@@ -2,10 +2,8 @@ from fastapi import FastAPI, Response
 from sqlalchemy.exc import IntegrityError
 from contextlib import asynccontextmanager
 import time
-
 from config import APP_TITLE, APP_DESCRIPTION, APP_VERSION
 from database import engine, SessionLocal, Base
-from models import Product, Category, Attribute
 from routes import products_router, categories_router, attributes_router, search_router
 from services.meili import meili_service, logger
 
@@ -76,7 +74,3 @@ def health_check():
     meili_status = meili_service.health_check()
     overall = "healthy" if meili_status == "available" else "degraded"
     return {"status": overall, "meilisearch": meili_status}
-
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: str = None):
-    return {"item_id": item_id, "q": q}

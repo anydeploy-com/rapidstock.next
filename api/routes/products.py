@@ -61,6 +61,54 @@ def get_product(product_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Product not found")
     return product
 
+@router.put("/{product_id}", response_model=ProductOut)
+def update_product(product_id: int, product: ProductCreate, db: Session = Depends(get_db)):
+    db_product = db.query(Product).filter(Product.id == product_id).first()
+    if not db_product:
+        raise HTTPException(status_code=404, detail="Product not found")
+
+    # Validate category exists
+    category = db.query(Category).filter(Category.id == product.category_id).first()
+    if not category:
+        raise HTTPException(status_code=400, detail=f"Category id {product.category_id} does not exist")
+
+    # Update product fields
+    db_product.name = product.name
+    db_product.description = product.description
+    db_product.category_id = product.category_id
+
+    # Remove old attributes
+    db.query(Attribute).filter(Attribute.product_id == product_id).delete(synchronize_session=False)
+    db.flush()
+
+    # Add new attributes
+    new_attribute_docs = []
+    for attr in product.attributes:
+        db_attr = Attribute(name=attr.name, value=attr.value, product_id=db_product.id)
+        db.add(db_attr)
+        db.flush()
+        new_attribute_docs.append({
+            "id": db_attr.id,
+            "name": db_attr.name,
+            "value": db_attr.value,
+            "product_id": db_attr.product_id
+        })
+    db.commit()
+    db.refresh(db_product)
+
+    # Upsert in Meilisearch
+    product_data = {
+        "id": db_product.id,
+        "name": db_product.name,
+        "description": db_product.description,
+        "category_id": db_product.category_id
+    }
+    meili_service.add_product(product_data)
+    if new_attribute_docs:
+        meili_service.add_attributes(new_attribute_docs)
+
+    return db_product
+
 @router.delete("/{product_id}", status_code=204)
 def delete_product(product_id: int, db: Session = Depends(get_db)):
     product = db.query(Product).filter(Product.id == product_id).first()
